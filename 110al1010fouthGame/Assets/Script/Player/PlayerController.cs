@@ -8,12 +8,13 @@ public class PlayerController : MonoBehaviour
     //!Public attributes
     public float _speed = 10f;
     public float _jumpForce = 10f;
+    public GameObject _myHammer;
     public Sprite [] _sprites;
 
     //!Components
     private Rigidbody2D _rb2D;
     private SpriteRenderer _spriteRender;
-    private BoxCollider2D _bc2D;
+    public BoxCollider2D _bc2D;
     private Animator _animator;
 
     //!Private attributes
@@ -34,9 +35,7 @@ public class PlayerController : MonoBehaviour
         //Get components
         _rb2D = GetComponent<Rigidbody2D>();
         _spriteRender = GetComponent<SpriteRenderer>();
-        _bc2D = GetComponent<BoxCollider2D>();
         _animator = GetComponent<Animator>();
-
 
         _offesetBC2D = _bc2D.offset;
         //Create a contactFilter configuration for the rays to check if the player is grounded
@@ -51,6 +50,11 @@ public class PlayerController : MonoBehaviour
         _filter2D.SetLayerMask(LayerMask.GetMask("Floor", "Platform"));
         
     }
+    void OnAttack()
+    {
+        _animator.SetTrigger("isAttacking");
+    }
+
 
     private void Update()
     {
@@ -73,95 +77,97 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    void OnShoot()
-    {
-        Debug.Log("ATTACCO");
-    }
-    private float _currentY;
     void FixedUpdate()
     {
-        //Store the current horizontal input in the float_moveHorizontal.
-
-        //Flip the sprite according to the direction
-        if (_moveHorizontal > 0)
+        if (_canMove)
         {
-            _spriteRender.flipX = false;
-            _bc2D.offset = _offesetBC2D;
-            _animator.SetBool("isRunning",true);
-        }
-        else if (_moveHorizontal < 0)
-        {
-            _spriteRender.flipX = true;
-            _bc2D.offset = new Vector2(_offesetBC2D.x * -1, _offesetBC2D.y);
-            _animator.SetBool("isRunning",true);
-        }
-        else
-        {
-            _animator.SetBool("isRunning",false);
-        }
+            //Store the current horizontal input in the float_moveHorizontal.
 
-        //Move the player through its body
-        _rb2D.velocity = new Vector2(_moveHorizontal * _speed, _rb2D.velocity.y);
-
-
-        bool grounded = Grounded();
-        //Check if the player ray is touching the ground and jump is enable
-        if (_jumpInput && grounded)
-        {
-            _rb2D.velocity = new Vector2(_rb2D.velocity.x, _jumpForce);    
-            _animator.SetBool("isJumping",true);
-        }
-
-        _animator.SetBool("isJumping",!Grounded());
-
-
-        _jumpInput = false;
-
-
-        //Check for fallFromPlatform input and start falling only if the player is touching the ground
-        if (_fallFromPlatformInput && grounded)
-        {
-            if (_currentPlatform != null)
+            //Flip the sprite according to the direction
+            if (_moveHorizontal > 0)
             {
-                //start falling from the platform 
-                _fallingFromPlatform = true;
+                _animator.SetBool("isRunning", true);
+                _spriteRender.flipX = false;
+                _bc2D.offset = _offesetBC2D;
             }
-        }
+            else if (_moveHorizontal < 0)
+            {
+                _animator.SetBool("isRunning", true);
+                _spriteRender.flipX = true;
+                _bc2D.offset = new Vector2(_offesetBC2D.x * -1, _offesetBC2D.y);
 
-        //Reset the fall input
-        _fallFromPlatformInput = false;
-        //Check if the player is grounded on a platform and the should fall down
-        if (CloudPlatformCheck() && _fallingFromPlatform)
-        {
-            //Cast the ray above the player head to check 
-            FallingFromPlatformCheck();
-            if (_currentPlatform != null && !_currentPlatform.isTrigger)
-            {
-                //Reset the cloud platform to initial state (as trigger)
-                _currentPlatform.isTrigger = true;
-                SpriteRenderer sprite = _currentPlatform.gameObject.GetComponent<SpriteRenderer>();
-                sprite.color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
-                _currentPlatform = null;
             }
-            //If the platform has become a trigger now the updated Grounded will return false because the playes is falling
-            //When it returns true again it means the player is touching the floor so disable the fallingFromPlatform check
-            if (Grounded())
+            if(_moveHorizontal == 0)
             {
-                //disable the fallingFromPlatform check
+                _animator.SetBool("isRunning", false);
+                if( _spriteRender.flipX == true)
+                    _bc2D.offset = new Vector2(_offesetBC2D.x * -1, _offesetBC2D.y);
+                else
+                    _bc2D.offset = _offesetBC2D; 
+            }
+            //Move the player through its body
+            _rb2D.velocity = new Vector2(_moveHorizontal * _speed, _rb2D.velocity.y);
+
+
+            bool grounded = Grounded();
+            //Check if the player ray is touching the ground and jump is enable
+            if (_jumpInput && grounded)
+            {
+                _rb2D.velocity = new Vector2(_rb2D.velocity.x, _jumpForce);
+                _animator.SetBool("isJumping", true);
+            }
+
+            _animator.SetBool("isJumping", !Grounded());
+
+
+            _jumpInput = false;
+
+
+            //Check for fallFromPlatform input and start falling only if the player is touching the ground
+            if (_fallFromPlatformInput && grounded)
+            {
+                if (_currentPlatform != null)
+                {
+                    //start falling from the platform 
+                    _fallingFromPlatform = true;
+                }
+            }
+
+            //Reset the fall input
+            _fallFromPlatformInput = false;
+            //Check if the player is grounded on a platform and the should fall down
+            if (CloudPlatformCheck() && _fallingFromPlatform)
+            {
+                //Cast the ray above the player head to check 
+                FallingFromPlatformCheck();
+                if (_currentPlatform != null && !_currentPlatform.isTrigger)
+                {
+                    //Reset the cloud platform to initial state (as trigger)
+                    _currentPlatform.isTrigger = true;
+                    SpriteRenderer sprite = _currentPlatform.gameObject.GetComponent<SpriteRenderer>();
+                    sprite.color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+                    _currentPlatform = null;
+                }
+                //If the platform has become a trigger now the updated Grounded will return false because the playes is falling
+                //When it returns true again it means the player is touching the floor so disable the fallingFromPlatform check
+                if (Grounded())
+                {
+                    //disable the fallingFromPlatform check
+                    _fallingFromPlatform = false;
+                }
+            }
+            else
+            {
+                //Disable the fallingFromPlatform check
                 _fallingFromPlatform = false;
             }
-        }
-        else
-        {
-            //Disable the fallingFromPlatform check
-            _fallingFromPlatform = false;
         }
     }
 
     void FixedUpdate2()
     {
         //Laser length
-        float laserLength =0.0125f;
+        float laserLength = 0.0125f;
         //Right ray start X
         float startPositionX = transform.position.x + (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) - 0.1f;
         //Hit only the objects of Platform layer
@@ -192,7 +198,7 @@ public class PlayerController : MonoBehaviour
     bool Grounded()
     {
         //Laser length
-        float laserLength =0.001f;
+        float laserLength =0.0125f;
         //Left ray start X
         float left = transform.position.x - (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) + 0.1f;
         //Right ray start X
@@ -233,7 +239,7 @@ public class PlayerController : MonoBehaviour
         //While the player is checking from falling from a platform invalidate this check
         if (_fallingFromPlatform) return true;
         //Laser length
-        float laserLength = 0.001f;
+        float laserLength = 0.0125f;
         //Left ray start X
         float left = transform.position.x - (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) + 0.1f;
         //Right ray start X
@@ -296,7 +302,7 @@ public class PlayerController : MonoBehaviour
     bool FallingFromPlatformCheck()
     {
         //Laser length
-        float laserLength = 0.25f;
+        float laserLength = 0.0125f;
         //Ray start point
         Vector2 startPosition = new Vector2(transform.position.x, transform.position.y - (_bc2D.bounds.extents.y));
         //Hit only the objects of Platform layer
@@ -323,10 +329,20 @@ public class PlayerController : MonoBehaviour
 
     public void LockMovement()
     {
+        StartCoroutine(BlockMovements());
+    }
+    IEnumerator BlockMovements()
+    {
         _canMove = false;
+        _myHammer.GetComponent<HammerController>().ActiveHammer();
+        yield return new WaitForSeconds(0.5f);
     }
     public void UnLockMovement()
     {
         _canMove = true;
+        _myHammer.GetComponent<HammerController>().DisactiveHammer();
+
+    }
+    private void OnCollisionEnter2D(Collision2D other) {
     }
 }
