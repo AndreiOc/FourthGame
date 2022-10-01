@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
 
     //!Public attributes
@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour
     RaycastHit2D[] hits = new RaycastHit2D[1];
     private bool _canMove = true;
     private float _moveHorizontal;
+
+    public float Health { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
     // Start is called before the first frame update
     void Start()
@@ -327,6 +329,9 @@ public class PlayerController : MonoBehaviour
         return hit.collider != null;
     }
 
+
+
+
     public void LockMovement()
     {
         StartCoroutine(BlockMovements());
@@ -343,6 +348,34 @@ public class PlayerController : MonoBehaviour
         _myHammer.GetComponent<HammerController>().DisactiveHammer();
 
     }
-    private void OnCollisionEnter2D(Collision2D other) {
+
+
+    public void OpeningTheDoor()
+    {
+        _animator.SetTrigger("isOpening");
+    }
+    public void ClosingTheDoor()
+    {
+        _animator.SetTrigger("isClosing");
+    }   
+    public void OnHit(float damage,Vector2 knockback)
+    {
+        _rb2D.AddForce(knockback);
+    }
+
+
+    public void OnHit(float damage)
+    {
+        Health -= damage;
+    }
+    private void OnCollisionStay2D(Collision2D other)
+    {    
+        if(other.collider.tag == "Door")
+        {
+            if(Input.GetKey(KeyCode.E))
+            {
+                Debug.Log("Press");
+            }
+        }          
     }
 }
