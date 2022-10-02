@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     //!Public attributes
     public float _speed = 10f;
     public float _jumpForce = 10f;
-    public GameObject _myHammer;
+    public HammerController _myHammer;
     public bool _enter = false;    
     public GameObject _door;
 
@@ -84,7 +84,6 @@ public class PlayerController : MonoBehaviour, IDamageable
                 EnterExitDoor();
             }
         }
-        Debug.Log(_bc2D.offset);
     }
     void OnMove(InputValue movementValue)
     {
@@ -118,6 +117,7 @@ public class PlayerController : MonoBehaviour, IDamageable
                 _animator.SetBool("isRunning", true);
                 _spriteRender.flipX = false;
                 _bc2D.offset = _offesetBC2D;
+                _myHammer.OffesetBoxColliderHammer(false);
 
             }
             else if (_moveHorizontal < 0)
@@ -125,6 +125,7 @@ public class PlayerController : MonoBehaviour, IDamageable
                 _animator.SetBool("isRunning", true);
                 _spriteRender.flipX = true;
                 _bc2D.offset = new Vector2(-1 * _offesetBC2D.x, _offesetBC2D.y );
+                _myHammer.OffesetBoxColliderHammer(true);
 
             }
             else if(_moveHorizontal == 0)
@@ -142,12 +143,15 @@ public class PlayerController : MonoBehaviour, IDamageable
             //Check if the player ray is touching the ground and jump is enable
             if (_jumpInput && grounded)
             {
+                _animator.SetBool("isJumping", Grounded());
                 _rb2D.velocity = new Vector2(_rb2D.velocity.x, _jumpForce);
-                _animator.SetBool("isJumping", true);
+                Debug.Log(Grounded());
+
+                Debug.Log("Eva trpoa");
             }
 
-            _animator.SetBool("isJumping", !Grounded());
             _jumpInput = false;
+            _animator.SetBool("isJumping", !Grounded());
 
             //Check for fallFromPlatform input and start falling only if the player is touching the ground
             if (_fallFromPlatformInput && grounded)
@@ -188,12 +192,13 @@ public class PlayerController : MonoBehaviour, IDamageable
                 _fallingFromPlatform = false;
             }
         }
+
     }
 
     void FixedUpdate2()
     {
         //Laser length
-        float laserLength = 0.0250f;
+        float laserLength = 0.0125f;
         //Right ray start X
         float startPositionX = transform.position.x + (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) - 0.1f;
         //Hit only the objects of Platform layer
@@ -226,7 +231,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     bool Grounded()
     {
         //Laser length
-        float laserLength =0.0250f;
+        float laserLength =0.0125f;
         //Left ray start X
         float left = transform.position.x - (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) + 0.1f;
         //Right ray start X
@@ -258,6 +263,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         //Draw the ray for debug purpose
         Debug.DrawRay(startPositionLeft, Vector2.down * laserLength, rayColor);
         Debug.DrawRay(startPositionRight, Vector2.down * laserLength, rayColor);
+        
         //If the ray hits the floor returns true, false otherwise
         return col2DHit != null;
     }
@@ -267,7 +273,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         //While the player is checking from falling from a platform invalidate this check
         if (_fallingFromPlatform) return true;
         //Laser length
-        float laserLength = 0.0250f;
+        float laserLength = 0.0125f;
         //Left ray start X
         float left = transform.position.x - (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) + 0.1f;
         //Right ray start X
@@ -330,7 +336,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     bool FallingFromPlatformCheck()
     {
         //Laser length
-        float laserLength = 0.0250f;
+        float laserLength = 0.0125f;
         //Ray start point
         Vector2 startPosition = new Vector2(transform.position.x, transform.position.y - (_bc2D.bounds.extents.y));
         //Hit only the objects of Platform layer
@@ -362,13 +368,13 @@ public class PlayerController : MonoBehaviour, IDamageable
     IEnumerator BlockMovements()
     {
         _canMove = false;
-        _myHammer.GetComponent<HammerController>().ActiveHammer();
+        _myHammer.ActiveHammer();
         yield return new WaitForSeconds(0.5f);
     }
     public void UnLockMovement()
     {
         _canMove = true;
-        _myHammer.GetComponent<HammerController>().DisactiveHammer();
+        _myHammer.DisactiveHammer();
 
     }
 

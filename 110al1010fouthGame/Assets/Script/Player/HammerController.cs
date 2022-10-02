@@ -5,16 +5,25 @@ using UnityEngine;
 public class HammerController : MonoBehaviour
 {
     // Start is called before the first frame update
-    public Collider2D _bc2D;
+    public BoxCollider2D _bc2D;
+    public GameObject _player;
+
+    //!Private components
+    SpriteRenderer _playerSprite;
+    Vector2 _offetPosition;
+    Animator _animator;
     void Start()
     {
         _bc2D.enabled = false;
+        _playerSprite = _player.GetComponent<SpriteRenderer>();
+        _offetPosition = transform.localPosition;
+        _animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     public void ActiveHammer()
     {
@@ -25,6 +34,16 @@ public class HammerController : MonoBehaviour
     {
         _bc2D.enabled = false;
         
+    }
+
+    public void OffesetBoxColliderHammer(bool off)
+    {
+        if(off)
+            _animator.SetTrigger("isLeft");
+        else
+            _animator.SetTrigger("isRight");
+
+
     }
 
 
