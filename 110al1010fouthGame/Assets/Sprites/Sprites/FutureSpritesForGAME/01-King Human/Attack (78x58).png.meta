@@ -119,9 +119,9 @@ TextureImporter:
       name: Attack (78x58)_0
       rect:
         serializedVersion: 2
-        x: 19
+        x: 0
         y: 0
-        width: 59
+        width: 78
         height: 58
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -137,13 +137,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Attack (78x58)_3
+      name: Attack (78x58)_1
       rect:
         serializedVersion: 2
-        x: 100
-        y: 12
-        width: 49
-        height: 42
+        x: 78
+        y: 0
+        width: 78
+        height: 58
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -151,20 +151,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5808efff8d9c2494fa5e99b7327f3fec
-      internalID: -1510325055
+      spriteID: 8602e24807461804dbe3967e2c1d7859
+      internalID: 814154147
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Attack (78x58)_4
+      name: Attack (78x58)_2
       rect:
         serializedVersion: 2
-        x: 165
-        y: 14
-        width: 37
-        height: 28
+        x: 156
+        y: 0
+        width: 78
+        height: 58
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -172,8 +172,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a548f92267f6c3a408c6ae40150e3ade
-      internalID: -1657276331
+      spriteID: 26582a3efb98a97438ea1c5e10e2a5f4
+      internalID: 1094293550
       vertices: []
       indices: 
       edges: []
@@ -189,10 +189,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Attack (78x58)_4: -1657276331
       Attack (78x58)_0: -1154087541
       Attack (78x58)_1: 814154147
-      Attack (78x58)_3: -1510325055
       Attack (78x58)_2: 1094293550
   spritePackingTag: 
   pSDRemoveMatte: 0

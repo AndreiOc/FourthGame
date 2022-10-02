@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour, IDamageable
 {
@@ -9,12 +10,13 @@ public class PlayerController : MonoBehaviour, IDamageable
     public float _speed = 10f;
     public float _jumpForce = 10f;
     public GameObject _myHammer;
-    public Sprite [] _sprites;
+    public bool _enter = false;    
+    public GameObject _door;
 
     //!Components
     private Rigidbody2D _rb2D;
     private SpriteRenderer _spriteRender;
-    public BoxCollider2D _bc2D;
+    private BoxCollider2D _bc2D;
     private Animator _animator;
 
     //!Private attributes
@@ -28,7 +30,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     RaycastHit2D[] hits = new RaycastHit2D[1];
     private bool _canMove = true;
     private float _moveHorizontal;
-
+    private Vector2 _moveInput;
     public float Health { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
     // Start is called before the first frame update
@@ -38,7 +40,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _rb2D = GetComponent<Rigidbody2D>();
         _spriteRender = GetComponent<SpriteRenderer>();
         _animator = GetComponent<Animator>();
-
+        _bc2D = GetComponent<BoxCollider2D>();
         _offesetBC2D = _bc2D.offset;
         //Create a contactFilter configuration for the rays to check if the player is grounded
         _filter2D = new ContactFilter2D
@@ -64,7 +66,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         {
             _moveHorizontal = Input.GetAxis("Horizontal");
             _animator.SetFloat("yVelocity", _rb2D.velocity.y);
-
+            
             //Keep down arrow pressed and press space
             if (Input.GetKey(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
             {
@@ -77,7 +79,32 @@ public class PlayerController : MonoBehaviour, IDamageable
                 //Let the player jump
                 _jumpInput = true;
             }
+            if(Input.GetKey(KeyCode.E) && _enter)
+            {
+                EnterExitDoor();
+            }
         }
+        Debug.Log(_bc2D.offset);
+    }
+    void OnMove(InputValue movementValue)
+    {
+        _moveInput = movementValue.Get<Vector2>();
+    }    
+    
+    /// <summary>
+    /// funzione per triggerare l'animazione e poi il 
+    /// </summary>
+    
+    void EnterExitDoor()
+    {
+        _animator.SetTrigger("isOpening");
+    }
+    /// <summary>
+    /// Funzione che lancio quando viene attivato l'animazione
+    /// </summary>
+    public void ChangeRoom()
+    {   
+        transform.position = _door.transform.position;
     }
     void FixedUpdate()
     {
@@ -91,26 +118,26 @@ public class PlayerController : MonoBehaviour, IDamageable
                 _animator.SetBool("isRunning", true);
                 _spriteRender.flipX = false;
                 _bc2D.offset = _offesetBC2D;
+
             }
             else if (_moveHorizontal < 0)
             {
                 _animator.SetBool("isRunning", true);
                 _spriteRender.flipX = true;
-                _bc2D.offset = new Vector2(_offesetBC2D.x * -1, _offesetBC2D.y);
+                _bc2D.offset = new Vector2(-1 * _offesetBC2D.x, _offesetBC2D.y );
 
             }
-            if(_moveHorizontal == 0)
+            else if(_moveHorizontal == 0)
             {
                 _animator.SetBool("isRunning", false);
-                if( _spriteRender.flipX == true)
-                    _bc2D.offset = new Vector2(_offesetBC2D.x * -1, _offesetBC2D.y);
+                if(_spriteRender.flipX)
+                    _bc2D.offset = new Vector2(-1 * _offesetBC2D.x, _offesetBC2D.y );
                 else
-                    _bc2D.offset = _offesetBC2D; 
+                    _bc2D.offset = _offesetBC2D;
             }
+
             //Move the player through its body
             _rb2D.velocity = new Vector2(_moveHorizontal * _speed, _rb2D.velocity.y);
-
-
             bool grounded = Grounded();
             //Check if the player ray is touching the ground and jump is enable
             if (_jumpInput && grounded)
@@ -120,10 +147,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             }
 
             _animator.SetBool("isJumping", !Grounded());
-
-
             _jumpInput = false;
-
 
             //Check for fallFromPlatform input and start falling only if the player is touching the ground
             if (_fallFromPlatformInput && grounded)
@@ -169,7 +193,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     void FixedUpdate2()
     {
         //Laser length
-        float laserLength = 0.0125f;
+        float laserLength = 0.0250f;
         //Right ray start X
         float startPositionX = transform.position.x + (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) - 0.1f;
         //Hit only the objects of Platform layer
@@ -197,10 +221,12 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
+
+
     bool Grounded()
     {
         //Laser length
-        float laserLength =0.0125f;
+        float laserLength =0.0250f;
         //Left ray start X
         float left = transform.position.x - (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) + 0.1f;
         //Right ray start X
@@ -241,7 +267,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         //While the player is checking from falling from a platform invalidate this check
         if (_fallingFromPlatform) return true;
         //Laser length
-        float laserLength = 0.0125f;
+        float laserLength = 0.0250f;
         //Left ray start X
         float left = transform.position.x - (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) + 0.1f;
         //Right ray start X
@@ -304,7 +330,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     bool FallingFromPlatformCheck()
     {
         //Laser length
-        float laserLength = 0.0125f;
+        float laserLength = 0.0250f;
         //Ray start point
         Vector2 startPosition = new Vector2(transform.position.x, transform.position.y - (_bc2D.bounds.extents.y));
         //Hit only the objects of Platform layer
@@ -328,9 +354,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         Debug.DrawRay(startPosition, Vector2.down * laserLength, rayColor);
         return hit.collider != null;
     }
-
-
-
 
     public void LockMovement()
     {
@@ -368,14 +391,6 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         Health -= damage;
     }
-    private void OnCollisionStay2D(Collision2D other)
-    {    
-        if(other.collider.tag == "Door")
-        {
-            if(Input.GetKey(KeyCode.E))
-            {
-                Debug.Log("Press");
-            }
-        }          
-    }
+
+
 }
