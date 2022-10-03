@@ -10,7 +10,6 @@ public class DoorController : MonoBehaviour
     private Animator _animator;
     public bool changingRoom = false;
     private BoxCollider2D _bc2D;
-    float _cntdnw = 5.0f;
 
     //!oggetti attaccati al player
   
@@ -34,21 +33,20 @@ public class DoorController : MonoBehaviour
 
             _player.GetComponent<PlayerController>()._enter = true;
             _player.GetComponent<PlayerController>()._door = _exit;
-
+            
         }
     }
     void OnTriggerExit2D(Collider2D other)
     {
         if(other.tag == "Player" ) 
         {     
-            Debug.Log("Im exit");
             other.GetComponent<PlayerController>()._enter = false;  
             StartCoroutine(Timer());   
         }        
     }
     IEnumerator Timer()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(10f);
         Debug.Log("Rimani aperta per 2 secondi e poi chiude");
         _animator.SetBool("isOpen",false);
         _exit.GetComponent<Animator>().SetBool("isOpen",false);

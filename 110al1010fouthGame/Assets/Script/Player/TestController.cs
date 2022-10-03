@@ -36,6 +36,8 @@ public class TestController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         boxColliderShift = bc2D.offset;
+
+        Debug.Log(boxColliderShift);
     }
     // Update is called once per frame
     void FixedUpdate()
@@ -62,13 +64,15 @@ public class TestController : MonoBehaviour
 
             if (movementInput.x < 0)
             {
-                bc2D.offset = new Vector2(-1 * boxColliderShift.x, boxColliderShift.y );
+                bc2D.offset = new Vector2(-1 * boxColliderShift.x,boxColliderShift.y);
                 spriteRenderer.flipX = true;
+                Debug.Log(bc2D.offset);
             }
             else if (movementInput.x > 0)
             {
                 bc2D.offset = boxColliderShift;
                 spriteRenderer.flipX = false;
+                Debug.Log(bc2D.offset);
 
             }
         }
@@ -95,48 +99,6 @@ public class TestController : MonoBehaviour
 
     }   
     
-
-    // private bool TryToMove()
-    // {
-    //     // float laserLength = 0.1f;
-    //     // RaycastHit2D hit;
-    //     // float startPositionY = transform.position.y - 0.6f; 
-    //     // float startPositionX;
-    //     // if(spriteRenderer.flipX == false)
-    //     //     startPositionX = transform.position.x + 0.15f;
-    //     // else
-    //     //     startPositionX = transform.position.x - 0.15f;
-
-    //     // //Get the first object hit by the ray
-    //     // if(spriteRenderer.flipX == false)
-    //     //     hit = Physics2D.Raycast(new Vector3(startPositionX,startPositionY), Vector2.right, laserLength);
-    //     // else if(spriteRenderer.flipX == true)
-    //     //     hit = Physics2D.Raycast(new Vector3(startPositionX,startPositionY), Vector2.left, laserLength);
-    //     // else 
-    //     //     hit = Physics2D.Raycast(new Vector3(startPositionX,startPositionY), Vector2.zero, laserLength);
-
-
-    //     // //Draw the raycast for debug stuff
-    //     // if(spriteRenderer.flipX == false)
-	//     //     Debug.DrawRay(new Vector3(startPositionX,startPositionY), Vector2.right * laserLength, Color.red);
-    //     // else if(spriteRenderer.flipX == true)            
-	//     //     Debug.DrawRay(new Vector3(startPositionX,startPositionY), Vector2.left * laserLength, Color.red);
-    //     // else
-    //     //     Debug.DrawRay(new Vector3(startPositionX,startPositionY), Vector2.zero * laserLength, Color.red);
-
-    //     // //If the collider of the object hit is not NUll
-    //     // if(hit.collider != null)
-    //     // {
-    //     //     if (hit.collider.tag == "Collider")
-    //     //     {
-    //     //         //Hit something, print the tag of the object
-    //     //         Debug.Log("Hitting: " + hit.collider);
-    //     //         return false;
-    //     //     }
-    //     // }
-    //     // return true;
-    // }
-
     /// <summary>
     /// Funzione diretta dall'input system new 
     /// </summary>

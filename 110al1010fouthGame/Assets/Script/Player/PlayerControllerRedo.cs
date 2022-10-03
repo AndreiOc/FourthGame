@@ -3,47 +3,45 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour, IDamageable
+public class PlayerControllerRedo : MonoBehaviour
 {
 
-    //!Public attributes
+    //!Componenti
     public float _speed = 10f;
     public float _jumpForce = 10f;
     public HammerController _myHammer;
     public bool _enter = false;    
     public GameObject _door;
 
-    //!Components
+    //!Componenti attaccati all'oggetto
     private Rigidbody2D _rb2D;
     private SpriteRenderer _spriteRender;
     private BoxCollider2D _bc2D;
     private Animator _animator;
+    
+    //!Componenti privati cambiali
+    private Vector2 _moveInput;
+    private Vector2 _offesetBC2D;
+    private bool _canMove = true;
 
-    //!Private attributes
+    //!Attributi per andare a definire salto e movenze sulle piattaforme 
     private bool _jumpInput = false;
     private bool _fallFromPlatformInput = false;
     private bool _fallingFromPlatform = false;
     private Collider2D _currentPlatform;
-    private ContactFilter2D _filter2D;
-    private Vector2 _offesetBC2D;
-    //Allocate an array with just one element capacity to store the floor when hit
-    RaycastHit2D[] hits = new RaycastHit2D[1];
-    private bool _canMove = true;
-    private float _moveHorizontal;
-    private Vector2 _moveInput;
-    public float Health { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    private ContactFilter2D _filter2D; 
+    RaycastHit2D[] _hits = new RaycastHit2D[1];
+   
 
-    // Start is called before the first frame update
+
     void Start()
     {
-        //Get components
         _rb2D = GetComponent<Rigidbody2D>();
         _spriteRender = GetComponent<SpriteRenderer>();
         _animator = GetComponent<Animator>();
         _bc2D = GetComponent<BoxCollider2D>();
-        _offesetBC2D = _bc2D.offset;
-        Debug.Log(_bc2D + " " + _offesetBC2D);
-        //Create a contactFilter configuration for the rays to check if the player is grounded
+        _offesetBC2D = _bc2D.offset;        
+ 
         _filter2D = new ContactFilter2D
         {
             //Ignore trigger colliders
@@ -53,21 +51,14 @@ public class PlayerController : MonoBehaviour, IDamageable
         };
         //Set the layer mask to hit only Floor and Platform layer
         _filter2D.SetLayerMask(LayerMask.GetMask("Floor", "Platform"));
-        
-    }
-    void OnAttack()
-    {
-        _animator.SetTrigger("isAttacking");
     }
 
-
-    private void Update()
+    // Update is called once per frame
+    void Update()
     {
-        if (_canMove)
+        if(_canMove)
         {
-            _moveHorizontal = Input.GetAxis("Horizontal");
             _animator.SetFloat("yVelocity", _rb2D.velocity.y);
-            
             //Keep down arrow pressed and press space
             if (Input.GetKey(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
             {
@@ -82,68 +73,44 @@ public class PlayerController : MonoBehaviour, IDamageable
             }
             if(Input.GetKey(KeyCode.E) && _enter)
             {
-                EnterExitDoor();
-            }
+                //EnterExitDoor();
+            }        
         }
-    }
-    void OnMove(InputValue movementValue)
-    {
-        _moveInput = movementValue.Get<Vector2>();
-    }    
-    
-    /// <summary>
-    /// funzione per triggerare l'animazione e poi il 
-    /// </summary>
-    
-    void EnterExitDoor()
-    {
-        _animator.SetTrigger("isOpening");
-    }
-    /// <summary>
-    /// Funzione che lancio quando viene attivato l'animazione
-    /// </summary>
-    public void ChangeRoom()
-    {   
-        transform.position = _door.transform.position;
-    }
-    void FixedUpdate()
+    }  
+  
+    private void FixedUpdate() 
     {
         if (_canMove)
         {   
+            //Quindi se corro verso uno dei due lati cambio lo sprite
             if(_moveInput!=Vector2.zero)
             {
-                if (_moveInput.x > 0)
+                if (_moveInput.x < 0)
+                {
+                    _bc2D.offset = new Vector2(-1 * _offesetBC2D.x,_offesetBC2D.y);
+                    _spriteRender.flipX = true;
+                }
+                else if (_moveInput.x > 0)
                 {
                     _bc2D.offset = _offesetBC2D;
-
                     _spriteRender.flipX = false;
-                    _myHammer.OffesetBoxColliderHammer(false);
-
                 }
-                else if (_moveInput.x < 0)
-                {
-                    _bc2D.offset = new Vector2(-1 * _offesetBC2D.x, _offesetBC2D.y );
-                    _spriteRender.flipX = true;
-                    _myHammer.OffesetBoxColliderHammer(true);
-                }
-                _animator.SetBool("isRunning", true);
-            }
+                _animator.SetBool("isRunning",true);
+            }    
             else
             {
-                _animator.SetBool("isRunning", false);
+                _animator.SetBool("isRunning",false);
             }
-            //Move the player through its body
             _rb2D.velocity = new Vector2(_moveInput.x * _speed, _rb2D.velocity.y);
             bool grounded = Grounded();
             //Check if the player ray is touching the ground and jump is enable
             if (_jumpInput && grounded)
             {
-                _animator.SetBool("isJumping", Grounded());
                 _rb2D.velocity = new Vector2(_rb2D.velocity.x, _jumpForce);
+                _animator.SetBool("isJumping",true);
             }
-
+            _animator.SetBool("isJumping",!Grounded());
             _jumpInput = false;
-            _animator.SetBool("isJumping", !Grounded());
 
             //Check for fallFromPlatform input and start falling only if the player is touching the ground
             if (_fallFromPlatformInput && grounded)
@@ -153,69 +120,59 @@ public class PlayerController : MonoBehaviour, IDamageable
                     //start falling from the platform 
                     _fallingFromPlatform = true;
                 }
-            }
-
-            //Reset the fall input
-            _fallFromPlatformInput = false;
-            //Check if the player is grounded on a platform and the should fall down
-            if (CloudPlatformCheck() && _fallingFromPlatform)
-            {
-                //Cast the ray above the player head to check 
-                FallingFromPlatformCheck();
-                if (_currentPlatform != null && !_currentPlatform.isTrigger)
-                {
-                    //Reset the cloud platform to initial state (as trigger)
-                    _currentPlatform.isTrigger = true;
-                    SpriteRenderer sprite = _currentPlatform.gameObject.GetComponent<SpriteRenderer>();
-                    sprite.color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
-                    _currentPlatform = null;
-                }
-                //If the platform has become a trigger now the updated Grounded will return false because the playes is falling
-                //When it returns true again it means the player is touching the floor so disable the fallingFromPlatform check
-                if (Grounded())
-                {
-                    //disable the fallingFromPlatform check
-                    _fallingFromPlatform = false;
-                }
-            }
-            else
-            {
-                //Disable the fallingFromPlatform check
-                _fallingFromPlatform = false;
-            }
-        }
-
+            }        
+        
+        } 
     }
-
     void FixedUpdate2()
     {
-        //Laser length
-        float laserLength = 0.0125f;
-        //Right ray start X
-        float startPositionX = transform.position.x + (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) - 0.1f;
-        //Hit only the objects of Platform layer
-        int layerMask = LayerMask.GetMask("Bonus");
-        //Left ray start point
-        Vector2 startPosition = new Vector2(startPositionX, transform.position.y - (_bc2D.bounds.extents.y + 0.05f));
-        //The color of the ray for debug purpose
-        Color rayColor = Color.red;
-        //Check if the left laser hits something
-        int totalObjectsHit = Physics2D.Raycast(startPosition, Vector2.down, _filter2D, hits, laserLength);
-
-        //Iterate the objects hit by the laser
-        for (int i = 0; i < totalObjectsHit; i++)
+        if(_canMove)
         {
-            //Get the object hit
-            RaycastHit2D hit = hits[i];
-            //Do something
-            if (hit.collider != null)
+        //Laser length
+            float laserLength = 0.0125f;
+            //Right ray start X
+            float startPositionX = transform.position.x + (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) - 0.1f;
+            //Hit only the objects of Platform layer
+            int layerMask = LayerMask.GetMask("Bonus");
+            //Left ray start point
+            Vector2 startPosition = new Vector2(startPositionX, transform.position.y - (_bc2D.bounds.extents.y + 0.05f));
+            //The color of the ray for debug purpose
+            Color rayColor = Color.red;
+            //Check if the left laser _hits something
+            int totalObjectsHit = Physics2D.Raycast(startPosition, Vector2.down, _filter2D, _hits, laserLength);
+
+            //Iterate the objects hit by the laser
+            for (int i = 0; i < totalObjectsHit; i++)
             {
-                SpriteRenderer sprite = hit.collider.GetComponent<SpriteRenderer>();
-                sprite.color = Color.green;
+                //Get the object hit
+                RaycastHit2D hit = _hits[i];
+                //Do something
+                if (hit.collider != null)
+                {
+                    SpriteRenderer sprite = hit.collider.GetComponent<SpriteRenderer>();
+                    sprite.color = Color.green;
+
+                }
             }
-            
         }
+    }    
+    /// <summary>
+    /// Serve a prendere gli inpouit del mio personaggio per farlo muovere
+    /// </summary>
+    /// <param name="movementValue"></param>
+    void OnMove(InputValue movementValue)
+    {
+        _moveInput = movementValue.Get<Vector2>();
+    }  
+
+    void OnAttack()
+    {
+        _animator.SetTrigger("isAttacking");
     }
+
+
+
+
 
 
 
@@ -230,24 +187,24 @@ public class PlayerController : MonoBehaviour, IDamageable
         //Hit only the objects of Platform layer
         int layerMask = LayerMask.GetMask("Floor", "Platform");
         //Left ray start point
-        Vector2 startPositionLeft = new Vector2(left, transform.position.y - (_bc2D.bounds.extents.y + 0.05f));
+        Vector2 startPositionLeft = new Vector2(left, transform.position.y - (_bc2D.bounds.extents.y + 0.15f));
         //Right ray start point
-        Vector2 startPositionRight = new Vector2(right, transform.position.y - (_bc2D.bounds.extents.y + 0.05f));
+        Vector2 startPositionRight = new Vector2(right, transform.position.y - (_bc2D.bounds.extents.y + 0.15f));
         //The color of the ray for debug purpose
         Color rayColor = Color.red;
-        //Check if the left laser hits something
-        int leftCount = Physics2D.Raycast(startPositionLeft, Vector2.down, _filter2D, hits, laserLength);
-        //Check if the right laser hits something
-        int rightCount = Physics2D.Raycast(startPositionRight, Vector2.down, _filter2D, hits, laserLength);
+        //Check if the left laser _hits something
+        int leftCount = Physics2D.Raycast(startPositionLeft, Vector2.down, _filter2D, _hits, laserLength);
+        //Check if the right laser _hits something
+        int rightCount = Physics2D.Raycast(startPositionRight, Vector2.down, _filter2D, _hits, laserLength);
 
         Collider2D col2DHit = null;
-        //If one of the lasers hits the floor
+        //If one of the lasers _hits the floor
         //if ((leftCount > 0 && hitsLeft[0].collider != null) || (rightCount > 0 && hitsRight[0].collider != null))
-        if ((leftCount > 0 || rightCount > 0) && hits[0].collider != null)
+        if ((leftCount > 0 || rightCount > 0) && _hits[0].collider != null)
         {
 
-            //Get the object hits collider
-            col2DHit = hits[0].collider;
+            //Get the object _hits collider
+            col2DHit = _hits[0].collider;
             //Change the color of the ray for debug purpose
             rayColor = Color.green;
         }
@@ -255,7 +212,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         Debug.DrawRay(startPositionLeft, Vector2.down * laserLength, rayColor);
         Debug.DrawRay(startPositionRight, Vector2.down * laserLength, rayColor);
         
-        //If the ray hits the floor returns true, false otherwise
+        //If the ray _hits the floor returns true, false otherwise
         return col2DHit != null;
     }
 
@@ -272,11 +229,11 @@ public class PlayerController : MonoBehaviour, IDamageable
         //Hit only the objects of Platform layer
         int layerMask = LayerMask.GetMask("Platform");
         //Left ray start point
-        Vector2 startPositionLeft = new Vector2(left, transform.position.y - (_bc2D.bounds.extents.y + 0.05f));
+        Vector2 startPositionLeft = new Vector2(left, transform.position.y - (_bc2D.bounds.extents.y + 0.15f));
         //Check if the left laser hit something
         RaycastHit2D hitLeft = Physics2D.Raycast(startPositionLeft, Vector2.down, laserLength, layerMask);
         //Right ray start point
-        Vector2 startPositionRight = new Vector2(right, transform.position.y - (_bc2D.bounds.extents.y + 0.05f));
+        Vector2 startPositionRight = new Vector2(right, transform.position.y - (_bc2D.bounds.extents.y + 0.15f));
         //Check if the right laser hit something
         RaycastHit2D hitRight = Physics2D.Raycast(startPositionRight, Vector2.down, laserLength, layerMask);
         //The color of the ray for debug purpose
@@ -320,7 +277,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         //Draw the ray for debug purpose
         Debug.DrawRay(startPositionLeft, Vector2.down * laserLength, rayColor);
         Debug.DrawRay(startPositionRight, Vector2.down * laserLength, rayColor);
-        //If the ray hits a platform returns true, false otherwise
+        //If the ray _hits a platform returns true, false otherwise
         return col2DHit != null;
     }
 
@@ -350,43 +307,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         //Draw the ray for debug purpose
         Debug.DrawRay(startPosition, Vector2.down * laserLength, rayColor);
         return hit.collider != null;
-    }
-
-    public void LockMovement()
-    {
-        StartCoroutine(BlockMovements());
-    }
-    IEnumerator BlockMovements()
-    {
-        _canMove = false;
-        _myHammer.ActiveHammer();
-        yield return new WaitForSeconds(0.5f);
-    }
-    public void UnLockMovement()
-    {
-        _canMove = true;
-        _myHammer.DisactiveHammer();
-
-    }
-
-
-    public void OpeningTheDoor()
-    {
-        _animator.SetTrigger("isOpening");
-    }
-    public void ClosingTheDoor()
-    {
-        _animator.SetTrigger("isClosing");
-    }   
-    public void OnHit(float damage,Vector2 knockback)
-    {
-        _rb2D.AddForce(knockback);
-    }
-
-
-    public void OnHit(float damage)
-    {
-        Health -= damage;
     }
 
 
