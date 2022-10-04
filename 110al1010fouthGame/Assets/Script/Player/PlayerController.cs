@@ -104,7 +104,6 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// </summary>
     public void ChangeRoom()
     {   
-        transform.position = _door.transform.position;
     }
     void FixedUpdate()
     {
@@ -117,14 +116,12 @@ public class PlayerController : MonoBehaviour, IDamageable
                     _bc2D.offset = _offesetBC2D;
 
                     _spriteRender.flipX = false;
-                    _myHammer.OffesetBoxColliderHammer(false);
 
                 }
                 else if (_moveInput.x < 0)
                 {
                     _bc2D.offset = new Vector2(-1 * _offesetBC2D.x, _offesetBC2D.y );
                     _spriteRender.flipX = true;
-                    _myHammer.OffesetBoxColliderHammer(true);
                 }
                 _animator.SetBool("isRunning", true);
             }
@@ -359,13 +356,11 @@ public class PlayerController : MonoBehaviour, IDamageable
     IEnumerator BlockMovements()
     {
         _canMove = false;
-        _myHammer.ActiveHammer();
         yield return new WaitForSeconds(0.5f);
     }
     public void UnLockMovement()
     {
         _canMove = true;
-        _myHammer.DisactiveHammer();
 
     }
 

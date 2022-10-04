@@ -12,39 +12,28 @@ public class HammerController : MonoBehaviour
     SpriteRenderer _playerSprite;
     Vector2 _offetPosition;
     Animator _animator;
+    Vector2 _localPosition;
     void Start()
     {
         _bc2D.enabled = false;
         _playerSprite = _player.GetComponent<SpriteRenderer>();
         _offetPosition = transform.localPosition;
         _animator = GetComponent<Animator>();
+        _localPosition = transform.localPosition;
     }
 
     // Update is called once per frame
-    void Update()
-    {
 
-    }
-    public void ActiveHammer()
+    public void LeftAttack()
     {
-        _bc2D.enabled = true;
-
-    }
-    public void DisactiveHammer()
-    {
-        _bc2D.enabled = false;
-        
+        Debug.Log("Attacco a sinistra");
+        transform.localPosition = _localPosition;
     }
 
-    public void OffesetBoxColliderHammer(bool off)
+    public void RightAttack()
     {
-        if(off)
-            _animator.SetTrigger("isLeft");
-        else
-            _animator.SetTrigger("isRight");
-
-
+        Debug.Log("Attacco a destra");
+        transform.localPosition = new Vector2(1.53f,0.0f);
     }
-
 
 }

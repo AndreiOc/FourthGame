@@ -17,13 +17,12 @@ public class DoorController : MonoBehaviour
     {
         _animator = GetComponent<Animator>();
         _player = GameObject.FindGameObjectWithTag("Player");
+        Debug.Log(_player);
         _bc2D = GetComponent<BoxCollider2D>();
     } 
 
     private void Update()
-    {
-
-    }
+    {    }
     void OnTriggerEnter2D(Collider2D other)
     {
         if(other.tag == "Player")
@@ -31,8 +30,8 @@ public class DoorController : MonoBehaviour
             _animator.SetBool("isOpen",true);
             _exit.GetComponent<Animator>().SetBool("isOpen",true);
 
-            _player.GetComponent<PlayerController>()._enter = true;
-            _player.GetComponent<PlayerController>()._door = _exit;
+            _player.GetComponent<PlayerControllerRedo>()._enter = true;
+            _player.GetComponent<PlayerControllerRedo>()._door = _exit;
             
         }
     }
@@ -40,16 +39,12 @@ public class DoorController : MonoBehaviour
     {
         if(other.tag == "Player" ) 
         {     
-            other.GetComponent<PlayerController>()._enter = false;  
-            StartCoroutine(Timer());   
+            _animator.SetBool("isOpen",false);
+            _exit.GetComponent<Animator>().SetBool("isOpen",false);
+            
+            other.GetComponent<PlayerControllerRedo>()._enter = false;  
+
         }        
-    }
-    IEnumerator Timer()
-    {
-        yield return new WaitForSeconds(10f);
-        Debug.Log("Rimani aperta per 2 secondi e poi chiude");
-        _animator.SetBool("isOpen",false);
-        _exit.GetComponent<Animator>().SetBool("isOpen",false);
     }
 
 }
