@@ -5,7 +5,7 @@ using UnityEngine;
 public class WallBouncy : MonoBehaviour
 {
     private Rigidbody2D _rb2D;
-    public float _knockBackForce = 2000f;
+    public float _knockBackForce = 100f;
     public GameObject _player;
     private SpriteRenderer _playerSprite;
 
@@ -18,7 +18,7 @@ public class WallBouncy : MonoBehaviour
         Debug.Log("cc");
         IDamageable damageableObject = other.collider.GetComponent<IDamageable>();
 
-        if(damageableObject != null)
+        if(other.collider.CompareTag("Enemy"))
         {
             Debug.Log("Collision");
            //Vettori utili al knockback
@@ -30,7 +30,7 @@ public class WallBouncy : MonoBehaviour
 
             //se attacco da destra va a destra 
             Vector2 knockBack = directionKnockback * _knockBackForce;
-            damageableObject.OnHit(0f,knockBack);
+            damageableObject.OnHit(0,knockBack);
                
         }
     }

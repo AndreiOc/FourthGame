@@ -5,8 +5,8 @@ using UnityEngine;
 public class PigController : MonoBehaviour, IDamageable
 {
 
-    private float health = 3;    
-    public float Health
+    [SerializeField] private int health = 5;    
+    public int Health
     {
         set
         {
@@ -49,7 +49,6 @@ public class PigController : MonoBehaviour, IDamageable
         _bc2D = GetComponent<BoxCollider2D>();
        
         _offesetBC2D = _bc2D.offset;         
-        Debug.Log(transform.position);
         layerMask = LayerMask.GetMask("Player");
     }
 
@@ -96,14 +95,21 @@ public class PigController : MonoBehaviour, IDamageable
         Debug.DrawRay(new Vector2(transform.position.x + 0.4f,transform.position.y), Vector2.right * laserLength, Color.blue);
 
     }
-    public void OnHit(float damage, Vector2 knockback)
+    public void OnHit(int damage, Vector2 knockback)
     {
-        Health -= damage;
+        Health -= damage;  
         _rb2D.AddForce(knockback);
+        Debug.Log(health);
     }
-    public void OnHit(float damage)
+    public void OnHit(int damage)
     {
-        Health -= damage;
+        Health -= damage;  
+        Debug.Log("Da hit senza knock " + health);
+
+    }
+    public void DestroyEnemy()
+    {
+        Destroy(gameObject);
     }
 
 }

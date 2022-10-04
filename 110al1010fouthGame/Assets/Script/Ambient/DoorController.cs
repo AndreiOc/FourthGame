@@ -17,7 +17,6 @@ public class DoorController : MonoBehaviour
     {
         _animator = GetComponent<Animator>();
         _player = GameObject.FindGameObjectWithTag("Player");
-        Debug.Log(_player);
         _bc2D = GetComponent<BoxCollider2D>();
     } 
 

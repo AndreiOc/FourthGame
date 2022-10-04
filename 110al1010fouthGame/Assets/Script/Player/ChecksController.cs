@@ -13,13 +13,12 @@ public class ChecksController : MonoBehaviour
 
     //!Attributi per andare a definire salto e movenze sulle piattaforme 
     protected bool _jumpInput = false;
-    protected bool _fallFromPlatformInput = false;
-    protected bool _fallingFromPlatform = false;
-    protected Collider2D _currentPlatform;
+    [SerializeField] protected bool _fallFromPlatformInput = false;
+    [SerializeField] protected bool _fallingFromPlatform = false;
+    [SerializeField] protected Collider2D _currentPlatform;
     protected ContactFilter2D _filter2D; 
     protected RaycastHit2D[] _hits = new RaycastHit2D[1];
     
-        
     //!Componenti privati cambiali
     protected Vector2 _moveInput;
     protected Vector2 _offesetBC2D;
@@ -152,10 +151,11 @@ public class ChecksController : MonoBehaviour
         return col2DHit != null;
     }
 
+    //Tecnicamente dovrei far disattivare il 
     protected bool FallingFromPlatformCheck()
     {
         //Laser length
-        float laserLength = 0.0125f;
+        float laserLength = 0.25f;
         //Ray start point
         Vector2 startPosition = new Vector2(transform.position.x, transform.position.y - (_bc2D.bounds.extents.y));
         //Hit only the objects of Platform layer
@@ -163,14 +163,14 @@ public class ChecksController : MonoBehaviour
         //Check if the laser hit something
         RaycastHit2D hit = Physics2D.Raycast(startPosition, Vector2.down, laserLength, layerMask);
         //The color of the ray for debug purpose
-        Color rayColor = Color.red;
+        Color rayColor = Color.yellow;
         if (hit.collider != null)
         {
             rayColor = Color.green;
         }
         else
         {
-            rayColor = Color.red;
+            rayColor = Color.blue;
             //the player overcame the platform falling down, so disable the fallingFromPlatform check
             _fallingFromPlatform = false;
         }
@@ -208,7 +208,6 @@ public class ChecksController : MonoBehaviour
                 //Do something
             if (hit2D.collider != null)
             {
-                Debug.Log("Dovrei smettere di potercorrere");
             }
 
             if(!_spriteRender.flipX)
