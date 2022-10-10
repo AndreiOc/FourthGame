@@ -208,6 +208,7 @@ public class ChecksController : MonoBehaviour
                 //Do something
             if (hit2D.collider != null)
             {
+                
             }
 
             if(!_spriteRender.flipX)

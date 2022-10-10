@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerControllerRedo : ChecksController
+public class PlayerControllerRedo : ChecksController, IDamageable
 {
 
     //!Componenti
@@ -17,6 +17,17 @@ public class PlayerControllerRedo : ChecksController
     private float _maxHoldJump = 0.3f;
     public float _holdJumpTimer = 0.0f;
     public bool _isHolding = false;
+    private int _health = 6;
+    public int Health
+    { 
+        get{return _health; } 
+        set 
+        {
+            _health = value;
+            if(_health <=0)
+                _animator.SetTrigger("isDying");
+        } 
+    }
 
 
     // Update is called once per frame
@@ -31,6 +42,7 @@ public class PlayerControllerRedo : ChecksController
                 _jumpInput = true;
                 _isHolding = true;
                 _rb2D.velocity = Vector2.up * _jumpForce;
+                Debug.Log("Salto");
 
             }
             if (Input.GetKey(KeyCode.Space) && _jumpInput)
@@ -66,7 +78,7 @@ public class PlayerControllerRedo : ChecksController
 
     private void FixedUpdate()
     {
-        Cast();
+        //Cast();
         if (_canMove)
         {
             //Quindi se corro verso uno dei due lati cambio lo sprite
@@ -88,6 +100,7 @@ public class PlayerControllerRedo : ChecksController
             }
             else
             {
+                _moveInput = Vector2.zero;
                 _animator.SetBool("isRunning", false);
             }
             _rb2D.velocity = new Vector2(_moveInput.x * _speed, _rb2D.velocity.y);
@@ -103,7 +116,6 @@ public class PlayerControllerRedo : ChecksController
                 }
             }
             _fallFromPlatformInput = false;
-            Debug.Log("Could :" + CloudPlatformCheck());
             //Check if the player is grounded on a platform and the should fall down
             if (CloudPlatformCheck() && _fallingFromPlatform)
             {
@@ -142,6 +154,8 @@ public class PlayerControllerRedo : ChecksController
     {
         if (_canMove)
             _moveInput = movementValue.Get<Vector2>();
+        else
+            _moveInput = Vector2.zero;
     }
 
     void OnGoDown()
@@ -161,7 +175,7 @@ public class PlayerControllerRedo : ChecksController
     public void LockMovement()
     {
         _canMove = false;
-        _myHammer.GetComponent<BoxCollider2D>().enabled = true;
+        _myHammer._bc2D.enabled = true;
     }
     public void UnLockMovement()
     {
@@ -170,4 +184,16 @@ public class PlayerControllerRedo : ChecksController
 
     }
 
+    public void OnHit(int damage, Vector2 knockback)
+    {
+        Health -= damage;  
+        Debug.Log(knockback);
+        _rb2D.AddForce(knockback);
+        _animator.SetTrigger("isHitting");
+    }
+
+    public void OnHit(int damage)
+    {
+        Health -= damage;  
+    }
 }

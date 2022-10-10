@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PigController : MonoBehaviour, IDamageable
+public class PigController : ChecksController, IDamageable
 {
 
     [SerializeField] private int health = 5;    
+    [SerializeField] private GameManager _gamemanager;
     public int Health
     {
         set
@@ -22,27 +23,24 @@ public class PigController : MonoBehaviour, IDamageable
         }
     }
 
+
+    //!Component pubblic
+    public int _damage = 1;
+    public float _knockBackForce = 500f;
     public float _speed = 10f;
     public float laserLength = 4f;
 
-    //!Componenti attaccati all'oggetto
-    private Rigidbody2D _rb2D;
-    private SpriteRenderer _spriteRender;
-    private BoxCollider2D _bc2D;
-    private CircleCollider2D _cc2D;
-    private Animator _animator;    
 
     //!Componenti privati cambiali
-    private Vector2 _offesetBC2D;
     private Vector2 _directionPlayer;
     public Vector2 _startPosition =  new Vector2(10.8f,0.7f);
-    private bool _canMove = true;
     private bool _Collide = false;
     
     int layerMask;
     // Start is called before the first frame update
     void Start()
     {
+        _gamemanager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _rb2D = GetComponent<Rigidbody2D>();
         _spriteRender = GetComponent<SpriteRenderer>();
         _animator = GetComponent<Animator>();
@@ -58,6 +56,13 @@ public class PigController : MonoBehaviour, IDamageable
 
     private void FixedUpdate()
     {
+        
+        _animator.SetFloat("yVelocity", _rb2D.velocity.y);
+        if(!Grounded())
+            _animator.SetBool("isJumping",true);
+        else
+            _animator.SetBool("isJumping",false);
+        
         //Get the first object hit by the ray
         RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2(transform.position.x - 0.4f,transform.position.y), Vector2.left, laserLength,layerMask);
         RaycastHit2D hitRight = Physics2D.Raycast(new Vector2(transform.position.x + 0.4f,transform.position.y), Vector2.right, laserLength,layerMask);
@@ -99,6 +104,7 @@ public class PigController : MonoBehaviour, IDamageable
     {
         Health -= damage;  
         _rb2D.AddForce(knockback);
+        _animator.SetTrigger("isHitting");
         Debug.Log(health);
     }
     public void OnHit(int damage)
@@ -110,7 +116,33 @@ public class PigController : MonoBehaviour, IDamageable
     public void DestroyEnemy()
     {
         Destroy(gameObject);
+        _gamemanager.ActualEnemy -= 1;
     }
+    private void OnCollisionStay2D(Collision2D other)
+    {
+        if(other.collider.CompareTag("Player"))
+        {
+            Vector2 directionKnockback;
 
+            _animator.SetBool("isAttacking",true);
+            if(!_spriteRender.flipX)
+                directionKnockback = new Vector2(-1,0);
+            else
+                directionKnockback = new Vector2(1,0);
+            Vector2 knockBack = directionKnockback * _knockBackForce;
+            other.collider.GetComponent<PlayerControllerRedo>().OnHit(_damage,knockBack);
+        }       
+        if(other.collider.CompareTag("Enemy"))
+        {
+            Physics2D.IgnoreCollision(other.collider,GetComponent<Collider2D>(),true);
+            
+        }    
+    }
+    private void OnCollisionExit2D(Collision2D other) {
+        if(other.collider.CompareTag("Player"))
+        {
+            _animator.SetBool("isAttacking",false);
+        }          
+    }
 }
 
