@@ -119,10 +119,10 @@ TextureImporter:
       name: Decorations (32x32)_0
       rect:
         serializedVersion: 2
-        x: 35
-        y: 121
-        width: 26
-        height: 39
+        x: 32
+        y: 128
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,9 +141,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 153
-        width: 96
-        height: 7
+        y: 128
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -161,12 +161,12 @@ TextureImporter:
       name: Decorations (32x32)_2
       rect:
         serializedVersion: 2
-        x: 176
-        y: 113
-        width: 16
-        height: 15
+        x: 96
+        y: 128
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -182,10 +182,10 @@ TextureImporter:
       name: Decorations (32x32)_3
       rect:
         serializedVersion: 2
-        x: 35
-        y: 39
-        width: 26
-        height: 25
+        x: 128
+        y: 128
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -203,10 +203,10 @@ TextureImporter:
       name: Decorations (32x32)_4
       rect:
         serializedVersion: 2
-        x: 73
-        y: 32
-        width: 55
-        height: 57
+        x: 160
+        y: 128
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -224,10 +224,10 @@ TextureImporter:
       name: Decorations (32x32)_5
       rect:
         serializedVersion: 2
-        x: 137
-        y: 32
-        width: 55
-        height: 57
+        x: 32
+        y: 96
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -245,10 +245,10 @@ TextureImporter:
       name: Decorations (32x32)_6
       rect:
         serializedVersion: 2
-        x: 160
-        y: 153
+        x: 64
+        y: 113
         width: 32
-        height: 7
+        height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -266,9 +266,9 @@ TextureImporter:
       name: Decorations (32x32)_7
       rect:
         serializedVersion: 2
-        x: 160
+        x: 96
         y: 113
-        width: 16
+        width: 32
         height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -287,10 +287,10 @@ TextureImporter:
       name: Decorations (32x32)_8
       rect:
         serializedVersion: 2
-        x: 35
-        y: 71
-        width: 26
-        height: 25
+        x: 128
+        y: 113
+        width: 32
+        height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -308,10 +308,10 @@ TextureImporter:
       name: Decorations (32x32)_9
       rect:
         serializedVersion: 2
-        x: 35
-        y: 96
-        width: 26
-        height: 25
+        x: 160
+        y: 113
+        width: 32
+        height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -329,12 +329,12 @@ TextureImporter:
       name: Decorations (32x32)_10
       rect:
         serializedVersion: 2
-        x: 64
-        y: 113
+        x: 32
+        y: 64
         width: 32
-        height: 15
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -347,43 +347,64 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Decorations (32x32)_11
+      name: Decorations (32x32)_13
       rect:
         serializedVersion: 2
-        x: 96
-        y: 113
-        width: 32
-        height: 15
+        x: 128
+        y: 32
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8dc2b8569db34094ba193985f8f3f1e3
-      internalID: -1171274943
+      spriteID: 8d67994ec1bdc47408df06e618001db2
+      internalID: -1144628091
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Decorations (32x32)_12
+      name: Decorations (32x32)_15
       rect:
         serializedVersion: 2
-        x: 128
-        y: 113
+        x: 32
+        y: 32
         width: 32
-        height: 15
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b645e5675c9a4d44babcb1b9f2ed1eb3
-      internalID: 1884702810
+      spriteID: 25e619a303a9286459d436bc93a77763
+      internalID: 1987696802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Decorations (32x32)_16
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 32
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77f3cd7182687044dae0892a5d068a41
+      internalID: 622416823
       vertices: []
       indices: 
       edges: []
@@ -400,17 +421,24 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       Decorations (32x32)_6: -2003684563
+      Decorations (32x32)_14: -168987124
+      Decorations (32x32)_19: -570658758
       Decorations (32x32)_1: -1625459685
       Decorations (32x32)_2: -647838087
       Decorations (32x32)_5: 1854293415
+      Decorations (32x32)_15: 1987696802
       Decorations (32x32)_0: 1163125386
       Decorations (32x32)_9: 301414357
       Decorations (32x32)_3: 979418145
       Decorations (32x32)_10: -308111725
       Decorations (32x32)_12: 1884702810
+      Decorations (32x32)_16: 622416823
+      Decorations (32x32)_18: 210856973
       Decorations (32x32)_4: -629199527
+      Decorations (32x32)_13: -1144628091
       Decorations (32x32)_8: 197685517
       Decorations (32x32)_11: -1171274943
+      Decorations (32x32)_17: 450292209
       Decorations (32x32)_7: -1586182942
   spritePackingTag: 
   pSDRemoveMatte: 0

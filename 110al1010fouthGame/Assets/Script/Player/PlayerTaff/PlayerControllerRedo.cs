@@ -115,11 +115,9 @@ public class PlayerControllerRedo : ChecksController, IDamageable
                     _fallingFromPlatform = true;
                 }
             }
-            _fallFromPlatformInput = false;
             //Check if the player is grounded on a platform and the should fall down
             if (CloudPlatformCheck() && _fallingFromPlatform)
             {
-                Debug.Log(CloudPlatformCheck());
                 //Cast the ray above the player head to check 
                 FallingFromPlatformCheck();
                 if (_currentPlatform != null && !_currentPlatform.isTrigger)
@@ -196,4 +194,6 @@ public class PlayerControllerRedo : ChecksController, IDamageable
     {
         Health -= damage;  
     }
+
+    
 }

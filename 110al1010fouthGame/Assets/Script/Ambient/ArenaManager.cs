@@ -33,7 +33,6 @@ public class ArenaManager : MonoBehaviour
         {
             float x = Random.Range(_spawnPoints[0].position.x,_spawnPoints[1].position.x);
             float y = Random.Range(_spawnPoints[2].position.y,_spawnPoints[3].position.y);
-            Debug.Log(x + " " + y );
             Instantiate(_enemies[0],new Vector3(x,y,0),Quaternion.identity);
         }
     }
