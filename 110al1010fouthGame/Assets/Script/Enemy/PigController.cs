@@ -56,22 +56,19 @@ public class PigController : ChecksController, IDamageable
 
     // Update is called once per frame
     void Update()
-    {}
+    {
 
+    }
     private void FixedUpdate()
     {
-        
         if (!_isDead)
         {
-            while(!Grounded())
-            {
-                _fallFromPlatformInput = true;
-            }
             _animator.SetFloat("yVelocity", _rb2D.velocity.y);
-            if (!Grounded())
-                _animator.SetBool("isJumping", Grounded());
+            if(_rb2D.velocity.y!=0)
+                _animator.SetBool("isJumping",true);
             else
-                _animator.SetBool("isJumping", Grounded());
+                _animator.SetBool("isJumping",false);
+
 
             //Get the first object hit by the ray
             RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2(transform.position.x - 0.4f, transform.position.y), Vector2.left, laserLength, layerMask);
@@ -102,52 +99,47 @@ public class PigController : ChecksController, IDamageable
             }
             if (hitRight.collider == null && hitLeft.collider == null)
                 _animator.SetBool("isRunning", false);
-
-
             //Method to draw the ray in scene for debug purpose
             Debug.DrawRay(new Vector2(transform.position.x - 0.4f, transform.position.y), Vector2.left * laserLength, Color.red);
             Debug.DrawRay(new Vector2(transform.position.x + 0.4f, transform.position.y), Vector2.right * laserLength, Color.blue);
-            
-            
-            
-            
-            bool grounded = Grounded();
-            //Check for fallFromPlatform input and start falling only if the player is touching the ground
-            if (_fallFromPlatformInput && grounded)
+        }
+    }
+
+    private void StayOnPlatform()
+    {
+        float laserLength = 0.0125f;
+        //Left ray start X
+        float left = transform.position.x - (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) + 0.1f;
+        //Right ray start X
+        float right = transform.position.x + (_bc2D.size.x * transform.localScale.x / 2.0f) + (_bc2D.offset.x * transform.localScale.x) - 0.1f;
+        //Hit only the objects of Platform layer
+        int layerMask = LayerMask.GetMask("Platform");
+        //Left ray start point
+        Vector2 startPositionLeft = new Vector2(left, transform.position.y - (_bc2D.bounds.extents.y + 0.15f));
+        //Check if the left laser hit something
+        RaycastHit2D hitLeft = Physics2D.Raycast(startPositionLeft, Vector2.down, laserLength, layerMask);
+        //Right ray start point
+        Vector2 startPositionRight = new Vector2(right, transform.position.y - (_bc2D.bounds.extents.y + 0.15f));
+        //Check if the right laser hit something
+        RaycastHit2D hitRight = Physics2D.Raycast(startPositionRight, Vector2.down, laserLength, layerMask);
+        //The color of the ray for debug purpose
+        Collider2D col2DHit = null;
+
+        if (hitLeft.collider != null || hitRight.collider != null)
+        {
+            col2DHit = hitLeft.collider != null ? hitLeft.collider : hitRight.collider;
+            if (col2DHit.isTrigger)
             {
-                if (_currentPlatform != null)
-                {
-                    //start falling from the platform 
-                    _fallingFromPlatform = true;
-                }
-            }
-            //Check if the player is grounded on a platform and the should fall down
-            if (CloudPlatformCheck() && _fallingFromPlatform)
-            {
-                //Cast the ray above the player head to check 
-                FallingFromPlatformCheck();
-                if (_currentPlatform != null && !_currentPlatform.isTrigger)
-                {
-                    //Reset the cloud platform to initial state (as trigger)
-                    _currentPlatform.isTrigger = true;
-                    SpriteRenderer sprite = _currentPlatform.gameObject.GetComponent<SpriteRenderer>();
-                    sprite.color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
-                    _currentPlatform = null;
-                }
-                //If the platform has become a trigger now the updated Grounded will return false because the playes is falling
-                //When it returns true again it means the player is touching the floor so disable the fallingFromPlatform check
-                if (Grounded())
-                {
-                    //disable the fallingFromPlatform check
-                    _fallingFromPlatform = false;
-                }
-            }
-            else
-            {
-                //Disable the fallingFromPlatform check
-                _fallingFromPlatform = false;
+                //Store the platform to reset later
+                _currentPlatform = col2DHit;
+                //Disable trigger behaviour of collider
+                _currentPlatform.isTrigger = false;
+                //Color the sprite of the cloud platform for debug purpose
+                SpriteRenderer sprite = _currentPlatform.gameObject.GetComponent<SpriteRenderer>();
+                sprite.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
             }
         }
+
     }
     public void OnHit(int damage, Vector2 knockback)
     {
